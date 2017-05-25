@@ -218,3 +218,76 @@ WHERE Country='Mexico';
 
 ---
 
+### DELETE 구문
+
+- 테이블의 기존 레코드를 삭제할때 사용한다
+
+```
+DELETE FROM table_name
+WHERE condition;
+
+DELETE FROM Customers
+WHERE CustomerName='Alfreds Futterkiste';
+```
+
+테이블을 삭제하지 않고 테이블의 모든 행을 지우는법
+
+```
+DELETE FROM table_name;
+
+DELETE * FROM table_name;
+```
+
+---
+
+#### TOP, LIMIT, ROWNUM 구문
+
+SELECT TOP 구문
+
+- 리턴 할 레코드 수를 지정할때 사용한다
+- 수천 개의 레코드가 있는 큰 테이블에서 유용하다
+- MySQL에서는 LIMIT, Oracle에서는 ROWNUM으로 사용한다
+
+SQL Server / MS 액세스 구문 :
+
+```
+SELECT TOP number|percent column_name(s)
+FROM table_name
+WHERE condition;
+
+SELECT TOP 3 * FROM Customers;
+```
+
+MySQL 구문 :
+
+```
+SELECT column_name(s)
+FROM table_name
+WHERE condition
+LIMIT number;
+
+SELECT * FROM Customers
+LIMIT 3;
+```
+
+오라클 구문 :
+
+
+
+```
+SELECT column_name(s)
+FROM table_name
+WHERE ROWNUM <= number;
+
+SELECT * FROM Customers
+WHERE ROWNUM <= 3;
+```
+
+SQL TOP PERCENT 구문
+
+테이블에서 처음 50%의 레코드를 선택:
+
+```
+SELECT TOP 50 PERCENT * FROM Customers;
+```
+
