@@ -63,7 +63,7 @@ model에서 각각의 field는 해당 Field 클래스의 객체여야 한다.
 django에서 field 클래스 유형들
 
  - column 유형 : 데이터베이스에 어떤 종류의 데이터를 저장할지 알려준다( INTEGER, VARCHAR, TEXT)
- - HTML widet : form field를 렌더링할때 사용한다( <input type="text">, <select>)
+ - HTML widet : form field를 렌더링할때 사용한다`( <input type="text">, <select>)`
 
 
 
@@ -973,7 +973,7 @@ class BookReview(Book, Article):
 
 
 
-### Field name “hiding” is not permitted 
+###  Field name “hiding” is not permitted 
 
 보통의 파이썬 클래스 상속에서, 자식 클래스는 부모 클래스의 어트리뷰트를 오버라이드 할 수 있습니다. 하지만 Django에서 필드 어트리뷰트의 경우에는 오버라이드가 허용되지 않습니다. 만약 부모 클래스가 author 라는 이름의 필드가 선언되어 있다면, 자식클래스는 같은 이름의 필드를 선언할 수 없습니다.
 
