@@ -14,6 +14,8 @@
 >>> b.save()
 ```
 
+---
+
 ## Saving changes to objects
 
 `save()` 사용해서 이미 데이터베이스에 있는 객체의 변경사항을 저장할 수 있다
@@ -21,7 +23,7 @@ django는 save()를 호출 할 때 까지 데이터베이스에 접근하지 않
 
 ### Saving ForeignKey and ManyToManyField fields
 
-**ForeignKey**
+**<ForeignKey>**
 
 **ForeignKey** 필드를 업데이트하는 것은 보통의 필드를 저장하는 것과 똑같은 방식으로 작동한다. 필드에 올바른 유형의 객체를 할당하기만 하면 된다.
 
@@ -33,7 +35,7 @@ django는 save()를 호출 할 때 까지 데이터베이스에 접근하지 않
 >>> entry.save()
 ```
 
-**ManyToManyField**
+**<ManyToManyField>**
 
 **ManyToManyField** 를 업데이트 할 때는 조금 다르다. 필드에 **add()** 메소드를 사용하여 레코드를 추가한다.
 
@@ -53,6 +55,8 @@ django는 save()를 호출 할 때 까지 데이터베이스에 접근하지 않
 >>> entry.authors.add(john, paul, george, ringo)
 ```
 
+---
+
 ## Retrieving objects
 
 데이터베이스에서 객체를 검색하기위해 모델 클래스의 **Manager** 를 통해 **QuerySet** 을 생성한다
@@ -61,11 +65,36 @@ QuerySet는 데이터베이스의 객체 컬렉션을 나타낸다. 0 개, 하�
 모델의 **Manager** 를 사용해 **QuerySet** 을 가져올 수 있다.
 >Manager : django 모델에 데이터베이스 쿼리 작업을 제공하는 인터페이스이다. django 어플리케이션의 모든 모델들은 모두 하나 이상의 manager가 존재한다.
 
+```python
+>>> Blog.objects
+<django.db.models.manager.Manager object at ...>
+>>> b = Blog(name='Foo', tagline='Bar')
+>>> b.objects
+Traceback:
+    ...
+AttributeError: "Manager isn't accessible via Blog instances."
+```
 
+>Manager는 모델 인스턴스가 아닌 모델 클래스로만 접근할 수 있다
 
 ### Retrieving all objects
 
+**all()** 메소드를 사용하면 테이블의 모든 객체를 QuerySet으로 가져올 수 있다
+
+```python
+>>> all_entries = Entry.objects.all()
+```
+
 ### Retrieving specific objects with filters
+
+필요한 객체만을 선별해서 QuerySet으로 가져오는 두가지 방법이 있다
+
+**filter(**kwargs)**
+주어진 검색 매개변수와 **일치하는** 객체들을 포함하는 QuerySet을 리턴한다
+
+**exclude(**kwargs)**
+주어진 검색 매개변수와 **일치하지 않는** 객체들을 포함하는 QuerySet을 리턴한다
+
 #### Chaining filters
 #### Filtered QuerySets are unique
 #### QuerySets are lazy
