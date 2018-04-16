@@ -1,0 +1,17 @@
+1. 매물 등록
+
+boolean 필드로 해놓고
+또 for_sale_created_date 필드도 한다음에
+
+메소드를 짜
+
+2. 포스트 가져오기
+
+코멘트 모델안에
+
+my_post = ForeignKey(Post)로 가져오게 해
+
+
+3. cannot get 오류
+
+우분투에서 안되는게 있다
