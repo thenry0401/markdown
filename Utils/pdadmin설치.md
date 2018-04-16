@@ -54,5 +54,24 @@ pip install pgadmin4-2.1-py2.py3-none-any.whl
 python ~/.pyenv/versions/pgadmin/lib/python3.6/site-packages/pgadmin4/pgAdmin4.py
 ```
 
-- `h
+- 이메일 계정과 비밀번호를 설정 후  `http://127.0.0.1:5050` 로 접속하면 된다
+
+---
+
+### 발생할 수 있는 에러
+
+- `PermissionError: [Errno 13] Permission denied: '/var/lib/pgadmin'` 
+
+
+```
+위와 같은 에러 발생시
+
+>>>sudo mkdir "/var/log/pgadmin"
+>>>sudo chmod a+wrx "/var/log/pgadmin"
+
+>>>sudo mkdir "/var/lib/pgadmin"
+>>>sudo chmod a+wrx "/var/lib/pgadmin"
+
+위와 같이 해결하였다
+```
 
