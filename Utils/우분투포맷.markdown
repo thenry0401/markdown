@@ -1,0 +1,18 @@
+## 포맷시 새로 깔아야 될것들
+
+리마커블
+크롬
+슬랙
+포스트맨
+SQLite
+터치패드 인디케이터
+텔레그램
+파이참
+PgAdmin
+ATOM
+DOCKER
+
+### 챙길파일
+블로그용 파일
+Documents 폴더
+Downloads 폴더
