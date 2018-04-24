@@ -11,6 +11,8 @@
 
 	- 이전에는 runserver로  **EC2**에서 **Web application**로 바로 요청을 보냈었다
 
+---
+
 #### 웹 서버 관리용 유저 생성
 
 ```
@@ -59,6 +61,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.deploy")
 서버에서 실행할땐 deploy, 로컬에서 실행할땐 debug가 되야한다
 ```
 
+---
+
+
 #### wsgi 모듈 작성
 
 - config 폴더 안에 wsgi 파이썬 패키지 작성 
@@ -96,6 +101,32 @@ uwsgi --http :8080 --home (virtualenv경로) --chdir (django프로젝트 경로)
 ```
 uwsgi --http :8080 --home (virtualenv경로) --chdir (django프로젝트 경로) -w (프로젝트명).wsgi.deploy
 ```
+
+#### uwsgi의 긴 명령어를 대체하기 위한 설정파일 작성
+
+- deploy_ec2/.config_secret/uwsgi/debug.ini
+
+- uwsgi 명령어 뒤에 써줬던 설정들을 그대로 써준다
+
+```
+[uwsgi]
+home = <가상환경 경로>
+chdir = <프로젝트 경로>
+module = config.wsgi.debug
+http = :8000
+```
+
+#### ADMIN 페이지 css 깨지는 문제 수정
+
+- uwsgi는 runserver 할때랑 css 찾는 방법이 달라져서 css가 깨진다
+
+- 아래 내용을 config/urls.py에 추가해준다
+
+```
+
+```
+
+---
 
 #### uWSGI 사이트 파일 작성
 
