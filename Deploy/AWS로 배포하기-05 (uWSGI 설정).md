@@ -66,9 +66,11 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.deploy")
 
 #### wsgi 모듈 작성
 
-- config 폴더 안에 wsgi 파이썬 패키지 작성 
+- config 폴더 안에 wsgi_modules 파이썬 패키지 작성 
 
-- config > wsgi > debug.py, deploy.py
+- config > wsgi_modules > debug.py, deploy.py
+
+- 기존 wsgi.py 는 건들지 않는
 
 ```
 (deploy.py)
@@ -112,19 +114,15 @@ uwsgi --http :8080 --home (virtualenv경로) --chdir (django프로젝트 경로)
 [uwsgi]
 home = <가상환경 경로>
 chdir = <프로젝트 경로>
-module = config.wsgi.debug
+module = config.wsgi_modules.debug
 http = :8000
 ```
 
-#### ADMIN 페이지 css 깨지는 문제 수정
+#### wsgi.py와 wsgi_modules 둘다 있는 이유
 
-- uwsgi는 runserver 할때랑 css 찾는 방법이 달라져서 css가 깨진다
+- uwsgi를 실행할땐 직접 wsgi 모듈을 설정해줄수 있다 runserver 일때는 설정해줄수가 없고 wsgi.py를 무조건 참조한다 따라서 두가지를 같이 작성해준
 
-- 아래 내용을 config/urls.py에 추가해준다
 
-```
-
-```
 
 ---
 
