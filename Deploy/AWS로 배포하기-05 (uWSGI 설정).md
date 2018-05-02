@@ -126,6 +126,29 @@ http = :8000
 
 ---
 
+#### STATIC_URL, STATIC_ROOT 분리
+
+- base.py에 있던 STATIC_URL을 지우고 deploy.py와 debug.py에 나눠서 작성한다
+
+```
+# Static URLs
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
+```
+
+#### STATIC_DIR, STATICFILES_DIRS 작성
+
+- base.py에 추가한다
+
+```
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+```
+
+---
+
 #### uWSGI 사이트 파일 작성
 
 ```
