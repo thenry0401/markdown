@@ -1,5 +1,22 @@
 # AWS로 배포하기 (Nginx 관련 설정)
 
+**우분투는 로컬과 서버에서의 세팅이 똑같다**
+
+#### Nginx의 역할
+
+왼쪽에서 오른쪽으로 요청을 보낸다
+
+- EC2 -> (http) -> Django
+
+- EC2 -> (http) -> uWSGI -> (WSGI) -> Django
+
+- EC2 -> (http) -> Nginx -> (uWSGI's UnixSocket) -> uWSGI -> (WSGI) -> Django
+
+	- Nginx와 uWSGI는 소켓통신을 한다
+	
+	- uWSGI가 받을 수 있는 소켓을 생성한다
+
+
 #### Nginx 안정화 최신버전 사전세팅 및 설치
 
 ```
@@ -8,24 +25,48 @@ sudo add-apt-repository ppa:nginx/stable
 sudo apt-get update
 sudo apt-get install nginx
 nginx -v
+
+nginx
+# 오류가 뜨면 sudo nginx
 ```
 
-#### Nginx 동작 User 변경
+> nginx를 위해 AWS 보안그룹에 80번 포트 추가
+
+#### 포트 확인하는 법 & 죽이는 법
+
+```
+ps -ax | grep <찾고싶은 이름>
+
+kill -9 <포트넘버>
+```
+
+#### user 생성
+
+```
+sudo appuser deploy
+```
+
+#### Nginx 동작 User 변경 및 서버이름 길이 변경
 
 ```
 sudo vi /etc/nginx/nginx.conf
 
-user nginx;
+user deploy;
+
+http {
+	# Prepare EC2 public domain length
+	server_names_hash_bucket_size 250;
+}
 ```
 
 #### Nginx 가상서버 설정 파일 작성
 
 ```
-sudo vi /etc/nginx/sites-available/mysite
+sudo vi /etc/nginx/sites-available/ec2
 
 server {
     listen 80;
-    server_name localhost;
+    server_name localhost; (서버에서는 ec2 퍼블릭 도메인으로 작성)
     charset utf-8;
     client_max_body_size 128M;
 
@@ -35,6 +76,36 @@ server {
         include       uwsgi_params;
     }
 }
+```
+
+#### uWSGI 사이트 파일 작성
+
+```
+[uwsgi]
+home = /home/ubuntu/.pyenv/versions/deploy_ec2 #가상환경 경로
+chdir = /srv/deploy_ec2/django_app # 프로젝트 폴더 경로
+module = mysite.wsgi_modules.deploy
+
+uid = deploy # uid, gid는 uwsgi를 실행할 user id, group id
+gid = deploy
+
+socket = /tmp/ec2.sock # 사용할 소켓 파일의 경로
+chmod-socket = 666 # 소켓의 소유 권한
+chown-socket = deploy:deploy # 소켓의 소유자 uid:gid
+
+enable-threads = true # 성능관련 세팅
+master = true # 성능관련 세팅
+pidfile = /tmp/ec2.pid # 성능관련 세팅
+```
+
+> 작성후 서버에 덮어씌워준다
+
+#### 서버에서 /tmp/ 폴더의 소유자 바꾸기
+
+```
+서버에서 /tmp/폴더의 소유자가 root로 되어있으면 접근이 안되기에 생성한 유저인 deploy 유저로 바꿔준다
+
+sudo chown -R deploy:deploy /tmp/
 ```
 
 #### 설정파일 심볼릭 링크 생성
