@@ -1,6 +1,10 @@
 # AWS로 배포하기 (Nginx 관련 설정)
 
-**우분투는 로컬과 서버에서의 세팅이 똑같다**
+
+#### 파이참에서 nginx support 플러그인 설치
+
+`Settings > Plugin > nginx Support 설치`
+
 
 #### Nginx의 역할
 
@@ -10,14 +14,14 @@
 
 - EC2 -> (http) -> uWSGI -> (WSGI) -> Django
 
-- EC2 -> (http) -> Nginx -> (uWSGI's UnixSocket) -> uWSGI -> (WSGI) -> Django
+- EC2 -> (http) -> Nginx -> (uWSGI's UnixSocket) -> uWSGI -> (WSGI) -> Django 
 
 	- Nginx와 uWSGI는 소켓통신을 한다
 	
 	- uWSGI가 받을 수 있는 소켓을 생성한다
 
 
-#### Nginx 안정화 최신버전 사전세팅 및 설치
+#### Nginx 안정화 최신버전 사전세팅 및 설치(로컬과 서버 동일)
 
 ```
 sudo apt-get install software-properties-common python-software-properties
@@ -40,7 +44,7 @@ ps -ax | grep <찾고싶은 이름>
 kill -9 <포트넘버>
 ```
 
-#### user 생성
+#### user 생성 ( 이 이후로 모두 서버에서의 설정)
 
 ```
 sudo appuser deploy
@@ -78,9 +82,11 @@ server {
 }
 ```
 
-#### uWSGI 사이트 파일 작성
+#### uWSGI 사이트 파일 작성(로컬의 프로젝트 폴더)
 
 ```
+<deploy_ec2/.config_secret/uwsgi/deploy.ini>
+
 [uwsgi]
 home = /home/ubuntu/.pyenv/versions/deploy_ec2 #가상환경 경로
 chdir = /srv/deploy_ec2/django_app # 프로젝트 폴더 경로
@@ -89,13 +95,15 @@ module = mysite.wsgi_modules.deploy
 uid = deploy # uid, gid는 uwsgi를 실행할 user id, group id
 gid = deploy
 
-socket = /tmp/ec2.sock # 사용할 소켓 파일의 경로
+socket = /tmp/ec2.sock # 사용할 소켓 파일의 경로 지정
 chmod-socket = 666 # 소켓의 소유 권한
 chown-socket = deploy:deploy # 소켓의 소유자 uid:gid
 
 enable-threads = true # 성능관련 세팅
 master = true # 성능관련 세팅
 pidfile = /tmp/ec2.pid # 성능관련 세팅
+
+vacuum = true # uwsgi 실행 종료 후 자동으로 ec2.pid와 ec2.sock 파일 삭제해주는 기능
 ```
 
 > 작성후 서버에 덮어씌워준다
@@ -108,20 +116,39 @@ pidfile = /tmp/ec2.pid # 성능관련 세팅
 sudo chown -R deploy:deploy /tmp/
 ```
 
-#### 설정파일 심볼릭 링크 생성
+#### uWSGI 실행되는지 확인
 
 ```
-sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/mysite
+# /srv/deploy_ec2 폴더 내에서
+# tmp폴더가 deploy유저권한인데 우리는 ubuntu유저로 실행을 하면 오류가 난다 그래서 deploy유저로써 실행하기 위해 아래와 같이 실행해야한다.
+
+sudo -u deploy /home/ubuntu/.pyenv/versions/deploy_ec2/bin/uwsgi --ini .config_secret/uwsgi/deploy.ini
 ```
 
-#### sites-enabled의 default파일 삭제
+- 정상적으로 실행됐다면 /tmp 폴더안에 `ec2.pid`와 `ec2.sock`파일이 생성된다 
+
+- 이제 소켓파일을 만들어서 Nginx의 요청을 받을 준비까지 된것이다
+
+- 이제 Nginx와 연결을 시킬 차례
+
+#### sites-enabled의 default파일 삭제(필요가 없어서 삭제함)
 
 ```
+# 서버내에서 실행
+
 sudo rm /etc/nginx/sites-enabled/default
+
 ```
 
-> nginx.conf파일에 어떤 폴더에 있는 설정을 가져와서 실행할 지 적혀있음
+#### 새롭게 설정파일 심볼릭 링크 생성 
 
+```
+# sites-enabled 폴더 내
+
+sudo ln -s /etc/nginx/sites-available/ec2 . 
+```
+
+> ec2 연결에 관한 설정파일 링크를 생성해준것임
 
 #### uWSGI, Nginx재시작
 
@@ -129,7 +156,30 @@ sudo rm /etc/nginx/sites-enabled/default
 sudo systemctl restart uwsgi nginx
 ```
 
--
+#### uWSGI 서비스 설정파일 작성
+
+- 서버를 껏다켜도 자동으로 nginx를 실행하도록 한다
+
+```
+sudo vi /etc/systemd/system/uwsgi.service
+
+[Unit]
+Description=uWSGI Emperor service
+After=syslog.target
+
+[Service]
+ExecPre=/bin/sh -c 'mkdir -p /run/uwsgi; chown deploy:deploy /run/uwsgi'
+ExecStart=/home/ubuntu/.pyenv/versions/deploy_ec2/bin/uwsgi --uid deploy --gid deploy --master --ini /srv/deploy_ec2/.config_secret/uwsgi/deploy.ini
+
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
+```
 
 ### 오류 발생 시
 
@@ -140,6 +190,25 @@ sudo systemctl restart uwsgi nginx
 sudo systemctl status uwsgi.service
 sudo systemctl status nginx.service
 ```
+
+
+
+
+
+
+
+ec2.conf, nginx.conf, uwsgi.service 파일을 프로젝트내에서 작성한다
+
+
+
+
+
+
+
+
+
+
+
 
 #### 502 Bad Gateway
 
