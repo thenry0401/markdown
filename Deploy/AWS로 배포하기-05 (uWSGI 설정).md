@@ -1,4 +1,4 @@
-# AWS로 배포하기 (uWSGI 관련 설정)
+<AWS로 배포하기 (uWSGI 관련 설정)>
 
 
 #### WSGI 란?
@@ -6,10 +6,10 @@
 - EC2 <-> WSGI(HTTP:8000) <-> Web application
 
 - EC2 <-> (runserver:8000) <-> Web application
-	
+
 	- **WSGI**는 **EC2**에서 받은 요청을 **Web application** 으로 요청을 전달한다
 
-	- 이전에는 runserver로  **EC2**에서 **Web application**로 바로 요청을 보냈었다
+	- 이전에는 runserver로  **EC2**에서 **Web application** 로 바로 요청을 보냈었다
 
 ---
 
@@ -66,7 +66,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.deploy")
 
 #### wsgi 모듈 작성
 
-- config 폴더 안에 wsgi_modules 파이썬 패키지 작성 
+- config 폴더 안에 wsgi_modules 파이썬 패키지 작성
 
 - config > wsgi_modules > debug.py, deploy.py
 
