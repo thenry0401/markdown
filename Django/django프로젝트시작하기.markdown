@@ -11,7 +11,8 @@ ex) pyenv virtualenv 3.5.3 django_env
 ```
 
 3.  django 설치
-`pip install django`
+`pip install django~=1.11.0`
+> 특정 버전 설치시 '~=' 뒤에 버전 작성 
 
 4. gitignore 생성
 
@@ -24,10 +25,10 @@ ex) pyenv virtualenv 3.5.3 django_env
 
 6. 프로젝트를 생성한다
 ```
-django_app 폴더 내에서 다음과 같이 입력
+django-admin startproject config
 
-django-admin startproject <프로젝트 이름>
 ```
+> 그후 상위 config 폴더 이름을 django_app으로 바꿔준다
 
 7. 앱을 생성한다 
 
